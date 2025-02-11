@@ -9,9 +9,10 @@ import { useTodo } from '../context/TodoContext';
 const schema = z.object({
   title: z
     .string()
-    .min(1, 'Task title is required')
-    .min(3, 'Task title must be at least 3 characters long')
-    .max(50, 'Task title must not exceed 50 characters'),
+    .min(1, 'Le titre est requis')
+    .min(3, 'Le titre doit contenir au moins 3 caractères')
+    .max(50, 'Le titre ne doit pas dépasser 50 caractères')
+    .trim(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -22,12 +23,9 @@ export function TodoForm() {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors }
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      title: '',
-    },
   });
 
   const onSubmit = (data: FormData) => {
@@ -37,35 +35,29 @@ export function TodoForm() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <Controller
-          control={control}
-          name="title"
-          render={({ field: { onChange, value, onBlur } }) => (
+      <Controller
+        control={control}
+        name="title"
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.formGroup}>
             <TextInput
-              style={[
-                styles.input,
-                errors.title && styles.inputError
-              ]}
-              placeholder="Add a new task"
+              style={[styles.input, errors.title && styles.inputError]}
+              placeholder="Nouvelle tâche..."
+              placeholderTextColor="#9CA3AF"
               value={value}
               onChangeText={onChange}
-              onBlur={onBlur}
-              returnKeyType="done"
-              onSubmitEditing={handleSubmit(onSubmit)}
             />
-          )}
-        />
-        {errors.title && (
-          <Text style={styles.errorText}>{errors.title.message}</Text>
+            {errors.title && (
+              <Text style={styles.errorText}>{errors.title.message}</Text>
+            )}
+          </View>
         )}
-      </View>
+      />
       <TouchableOpacity
-        style={[styles.button, isSubmitting && styles.buttonDisabled]}
+        style={styles.button}
         onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
       >
-        <Text style={styles.buttonText}>Add</Text>
+        <Text style={styles.buttonText}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -73,40 +65,52 @@ export function TodoForm() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
+    elevation: 1,
   },
-  inputContainer: {
+  formGroup: {
     flex: 1,
-    marginRight: 10,
   },
   input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    paddingHorizontal: 10,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    color: '#1F2937',
   },
   inputError: {
-    borderColor: 'red',
+    borderWidth: 1,
+    borderColor: '#EF4444',
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 10,
-    borderRadius: 4,
-    height: 40,
-  },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#3B82F6',
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
+    fontSize: 24,
     fontWeight: 'bold',
   },
   errorText: {
-    color: 'red',
+    color: '#EF4444',
     fontSize: 12,
     marginTop: 4,
+    marginLeft: 4,
   },
 });
