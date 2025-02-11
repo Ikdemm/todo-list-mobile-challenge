@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useTodo } from '../context/TodoContext';
 import type { Todo } from '../context/TodoContext';
 
@@ -9,6 +9,25 @@ interface TodoItemProps {
 
 export function TodoItem({ todo }: TodoItemProps) {
   const { toggleTodo, removeTodo } = useTodo();
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Task',
+      `Are you sure you want to delete "${todo.title}"?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => removeTodo(todo.id),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -23,7 +42,7 @@ export function TodoItem({ todo }: TodoItemProps) {
       </Text>
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={() => removeTodo(todo.id)}
+        onPress={handleDelete}
       >
         <Text style={styles.deleteText}>Delete</Text>
       </TouchableOpacity>
